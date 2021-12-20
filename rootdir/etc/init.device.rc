@@ -1,0 +1,33 @@
+#
+# Copyright (C) 2023 The LineageOS Project
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+on init
+    # Initialize cpusets to boot-time values
+    write /dev/cpuset/foreground/cpus 0-5
+    write /dev/cpuset/background/cpus 0-5
+    write /dev/cpuset/system-background/cpus 0-5
+    write /dev/cpuset/top-app/cpus 0-5
+
+on fs
+    mount_all /vendor/etc/fstab.${ro.hardware}
+    swapon_all /vendor/etc/fstab.${ro.hardware}
+
+on property:sys.boot_completed=1
+    # update cpuset now that processors are up
+    # Foreground should contain most cores (5 is reserved for top-app)
+    write /dev/cpuset/foreground/cpus 0-4
+
+    # top-app gets all cpus (including reserved #5)
+    write /dev/cpuset/top-app/cpus 0-5
+
+    #background contains a small subset (generally one little core)
+    write /dev/cpuset/background/cpus 0
+
+    # add system-background cpuset, a new cpuset for system services
+    # that should not run on larger cores
+    # system-background is for system tasks that should only run on
+    # little cores, not on bigs to be used only by init
+    write /dev/cpuset/system-background/cpus 0-3

@@ -1,0 +1,10 @@
+[
+  {
+    "repository": "android_device_linux_generic-common",
+    "target_path": "device/linux/generic-common"
+  },
+  {
+    "repository": "android_kernel_msft_lumia",
+    "target_path": "kernel/msft/lumia"
+  }
+]
